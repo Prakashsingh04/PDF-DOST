@@ -3,6 +3,11 @@ from flask_cors import CORS
 import os
 import pdfplumber
 
+
+
+#.\venv\Scripts\activate  always activate it 
+
+
 from utils.retriever import Retriever
 from utils.text_splitter import split_text
 from utils.embedder import Embedder
