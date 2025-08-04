@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import './App.css';
 
 function App() {
   const [file, setFile] = useState(null);
@@ -41,7 +42,6 @@ function App() {
 
     setLoading(true);
     try {
-      // i edited {filename ,question } filename was not written here
       const response = await axios.post('http://localhost:5000/ask', { filename, question });
       setAnswer(response.data.answer);
     } catch (err) {
@@ -52,37 +52,31 @@ function App() {
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
-      <h1>PDF-Dost</h1>
+    <div className="app-container">
+      <h1 className="heading">PDF-Dost 📄🤝</h1>
 
-      {/* Upload Section */}
-      <div style={{ marginBottom: '1rem' }}>
+      <div className="upload-section">
         <input type="file" accept="application/pdf" onChange={handleFileChange} />
-        <button onClick={handleUpload} style={{ marginLeft: '1rem' }}>Upload & Extract</button>
-        <p>{status}</p>
+        <button onClick={handleUpload}>Upload & Extract</button>
+        <p className="status">{status}</p>
       </div>
 
-      {/* Question UI */}
       {filename && (
-        <div>
+        <div className="question-section">
           <input
             type="text"
             placeholder="Ask your PDF something..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            style={{ padding: '0.5rem', width: '60%', marginRight: '1rem' }}
           />
-
-          <button onClick={askQuestion} style={{ padding: '0.5rem 1rem' }}>
-            Ask
-          </button>
+          <button onClick={askQuestion}>Ask</button>
         </div>
       )}
 
-      {loading && <p>Loading...</p>}
+      {loading && <p className="loading">Loading...</p>}
 
       {answer && (
-        <div style={{ marginTop: '1rem' }}>
+        <div className="answer-section">
           <strong>Answer:</strong>
           <p>{answer}</p>
         </div>
