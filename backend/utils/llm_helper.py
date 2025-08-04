@@ -1,41 +1,26 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+# utils/llm_helper.py
+
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
 class AnswerGenerator:
-    def __init__(self):
-        print("🚀 Loading Phi-1.5 model for faster inference...")
+    def __init__(self, model_name="google/flan-t5-small"):
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name).to(self.device)
 
-        self.tokenizer = AutoTokenizer.from_pretrained("microsoft/phi-1_5")  # You said you're using 1.5
-        self.model = AutoModelForCausalLM.from_pretrained(
-            "microsoft/phi-1_5",
-            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-            device_map="auto"  # Uses accelerate, don't set device below
-        )
+    def generate_answer(self, question, context):
+        prompt = f"Answer the following question based only on the context.\n\nContext: {context}\n\nQuestion: {question}"
 
-        self.qa_pipeline = pipeline(
-            "text-generation",
-            model=self.model,
-            tokenizer=self.tokenizer
-            # 🚫 remove device=... here
-        )
-
-    def generate_answer(self, question, context, max_len=250):
-        prompt = f"""You are an expert assistant. Based on the context below, answer the question concisely.
-
-Context:
-{context}
-
-Question: {question}
-Answer:"""
-
-        response = self.qa_pipeline(
-            prompt,
-            max_length=max_len,
-            do_sample=True,
+        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512).to(self.device)
+        outputs = self.model.generate(
+            **inputs,
+            max_new_tokens=100,
             temperature=0.7,
-            top_p=0.9
+            top_p=0.9,
+            do_sample=True,
+            pad_token_id=self.tokenizer.eos_token_id
         )
 
-        generated_text = response[0]['generated_text']
-        answer = generated_text.split("Answer:")[-1].strip()
-        return answer
+        answer = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        return answer.strip()
