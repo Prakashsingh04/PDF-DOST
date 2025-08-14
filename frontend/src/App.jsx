@@ -1,41 +1,52 @@
 import React, { useState } from "react";
-import QuestionPanel from "./components/QuestionPanel";
-import PDFViewer from "./components/PDFViewer";
+import Navbar from "./components/Navbar";
+import ChatMessage from "./components/ChatMessage";
+import PreviewPdf from "./components/PreviewPdf";
+import Action from "./components/Action";
+import Heros from "./pages/Heros";
+import { askQuestion } from "./services/api";
 
-const App = () => {
+function App() {
   const [pdfFile, setPdfFile] = useState(null);
-  const [uploadedFilename, setUploadedFilename] = useState("");
+  const [currentFilename, setCurrentFilename] = useState("");
+  const [showPreview, setShowPreview] = useState(true);
+  const [chatHistory, setChatHistory] = useState([]);
+
+  const handleSendMessage = async (question) => {
+    if (!currentFilename) return;
+    setChatHistory((prev) => [...prev, { sender: "user", text: question }]);
+    try {
+      const res = await askQuestion(currentFilename, question);
+      setChatHistory((prev) => [...prev, { sender: "bot", text: res.answer }]);
+    } catch {
+      setChatHistory((prev) => [...prev, { sender: "bot", text: "Error" }]);
+    }
+  };
 
   return (
-    <div className="flex h-screen bg-gray-100 p-4 gap-4">
-      {/* Left side: Q&A panel */}
-      <div className="w-1/2 flex flex-col bg-white shadow-lg rounded-lg p-4 overflow-y-auto">
-        <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">
-          PDF Q&A
-        </h1>
-        <QuestionPanel
-          setPdfFile={setPdfFile}
-          setUploadedFilename={setUploadedFilename}
-        />
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Navbar />
+      <Heros
+        onGetStarted={() =>
+          document.getElementById("tool-section")?.scrollIntoView({ behavior: "smooth" })
+        }
+      />
+      <div id="tool-section" className="flex-1 flex flex-col md:flex-row gap-4 p-4">
+        <ChatMessage messages={chatHistory} />
+        {showPreview && (
+          <div className="flex-1">
+            <PreviewPdf file={pdfFile} />
+          </div>
+        )}
       </div>
-
-      {/* Right side: PDF Viewer */}
-      <div className="w-1/2 flex flex-col bg-white shadow-lg rounded-lg overflow-hidden">
-        <h2 className="text-xl font-semibold p-4 border-b text-gray-700">
-          PDF Preview
-        </h2>
-        <div className="flex-1 overflow-auto p-4">
-          {pdfFile ? (
-            <PDFViewer file={pdfFile} />
-          ) : (
-            <div className="flex items-center justify-center h-full text-gray-400">
-              No PDF selected
-            </div>
-          )}
-        </div>
-      </div>
+      <Action
+        onFileSelect={setPdfFile}
+        onFilename={setCurrentFilename}
+        onSendMessage={handleSendMessage}
+        onPreviewToggle={() => setShowPreview((prev) => !prev)}
+      />
     </div>
   );
-};
+}
 
 export default App;
