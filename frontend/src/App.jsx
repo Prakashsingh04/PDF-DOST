@@ -1,88 +1,41 @@
-import { useState } from 'react';
-import axios from 'axios';
-import './App.css';
+import React, { useState } from "react";
+import QuestionPanel from "./components/QuestionPanel";
+import PDFViewer from "./components/PDFViewer";
 
-function App() {
-  const [file, setFile] = useState(null);
-  const [filename, setFilename] = useState('');
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState('');
-
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-
-  const handleUpload = async () => {
-    if (!file) return alert("Please select a PDF first!");
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      setStatus('Uploading...');
-      const uploadRes = await axios.post('http://localhost:5000/upload', formData);
-      const fname = uploadRes.data.filename;
-      setFilename(fname);
-
-      setStatus('Extracting...');
-      await axios.post('http://localhost:5000/extract', { filename: fname });
-
-      setStatus('PDF embedded successfully!');
-    } catch (err) {
-      setStatus('Upload/Extract failed.');
-      console.error(err);
-    }
-  };
-
-  const askQuestion = async () => {
-    if (!filename) return alert("Upload a PDF first!");
-    if (!question.trim()) return;
-
-    setLoading(true);
-    try {
-      const response = await axios.post('http://localhost:5000/ask', { filename, question });
-      setAnswer(response.data.answer);
-    } catch (err) {
-      setAnswer('Error: Could not get a response from backend.');
-      console.error(err);
-    }
-    setLoading(false);
-  };
+const App = () => {
+  const [pdfFile, setPdfFile] = useState(null);
+  const [uploadedFilename, setUploadedFilename] = useState("");
 
   return (
-    <div className="app-container">
-      <h1 className="heading">PDF-Dost 📄🤝</h1>
-
-      <div className="upload-section">
-        <input type="file" accept="application/pdf" onChange={handleFileChange} />
-        <button onClick={handleUpload}>Upload & Extract</button>
-        <p className="status">{status}</p>
+    <div className="flex h-screen bg-gray-100 p-4 gap-4">
+      {/* Left side: Q&A panel */}
+      <div className="w-1/2 flex flex-col bg-white shadow-lg rounded-lg p-4 overflow-y-auto">
+        <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">
+          PDF Q&A
+        </h1>
+        <QuestionPanel
+          setPdfFile={setPdfFile}
+          setUploadedFilename={setUploadedFilename}
+        />
       </div>
 
-      {filename && (
-        <div className="question-section">
-          <input
-            type="text"
-            placeholder="Ask your PDF something..."
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-          />
-          <button onClick={askQuestion}>Ask</button>
+      {/* Right side: PDF Viewer */}
+      <div className="w-1/2 flex flex-col bg-white shadow-lg rounded-lg overflow-hidden">
+        <h2 className="text-xl font-semibold p-4 border-b text-gray-700">
+          PDF Preview
+        </h2>
+        <div className="flex-1 overflow-auto p-4">
+          {pdfFile ? (
+            <PDFViewer file={pdfFile} />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-400">
+              No PDF selected
+            </div>
+          )}
         </div>
-      )}
-
-      {loading && <p className="loading">Loading...</p>}
-
-      {answer && (
-        <div className="answer-section">
-          <strong>Answer:</strong>
-          <p>{answer}</p>
-        </div>
-      )}
+      </div>
     </div>
   );
-}
+};
 
 export default App;

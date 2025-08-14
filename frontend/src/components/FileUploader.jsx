@@ -1,34 +1,34 @@
-// frontend/src/components/FileUploader.jsx
-import { useState } from 'react';
-import api from '../utils/api.js';
+import React, { useRef } from "react";
 
-function FileUploader({ onUploadSuccess }) {
-  const [file, setFile] = useState(null);
+const FileUploader = ({ onFileSelect }) => {
+  const fileInputRef = useRef();
 
-  const handleUpload = async () => {
-    if (!file) return alert("Please select a file!");
-
-    const formData = new FormData();
-    formData.append('pdf', file);
-
-    try {
-      await api.post('/upload', formData);
-      await api.get('/extract');
-      await api.get('/embed');
-      alert("File processed successfully!");
-      onUploadSuccess(); // trigger QA display
-    } catch (error) {
-      console.error("Upload error:", error);
-      alert("Failed to process PDF.");
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+      onFileSelect(file);
+    } else {
+      alert("Please select a valid PDF file.");
     }
   };
 
   return (
-    <div>
-      <input type="file" accept=".pdf" onChange={e => setFile(e.target.files[0])} />
-      <button onClick={handleUpload}>Upload & Process</button>
+    <div className="p-4 border rounded">
+      <button
+        onClick={() => fileInputRef.current.click()}
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        Upload PDF
+      </button>
+      <input
+        type="file"
+        accept="application/pdf"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+      />
     </div>
   );
-}
+};
 
 export default FileUploader;
