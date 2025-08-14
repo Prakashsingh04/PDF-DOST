@@ -5,7 +5,8 @@ from flask_cors import CORS
 import os
 import pdfplumber
 
-
+from dotenv import load_dotenv
+load_dotenv()
 
 #.\venv\Scripts\activate  always activate it 
 

@@ -21,7 +21,7 @@ class Retriever:
         # If embeddings are tensors, convert to numpy
         if hasattr(self.embeddings, 'cpu'):
             embeddings_np = self.embeddings.cpu().detach().numpy()
-        else:
+        else: 
             embeddings_np = np.array(self.embeddings)
 
         # Also convert question embedding to numpy
