@@ -23,7 +23,7 @@ CORS(app)
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Ensure upload folder exists
+# Ensureing upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # ----------- Utility: Extract text from PDF ------------

@@ -1,21 +1,22 @@
 import React, { useState } from "react";
 import { uploadPDF, extractChunks } from "../../services/api";
-import { ArrowUpTrayIcon } from "@heroicons/react/24/solid"; // needs @heroicons/react
+import { ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 
 const Upload = ({ onFilename, onFileSelect, compact = false }) => {
   const [loading, setLoading] = useState(false);
 
   const handleChange = async (e) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
+
     setLoading(true);
     try {
       const { filename } = await uploadPDF(file);
       onFilename(filename);
       onFileSelect(`http://localhost:5000/static/uploads/${filename}`);
       await extractChunks(filename);
-    } catch {
-      console.error("❌ Upload failed");
+    } catch (err) {
+      console.error("❌ Upload failed", err);
     } finally {
       setLoading(false);
     }
@@ -24,11 +25,13 @@ const Upload = ({ onFilename, onFileSelect, compact = false }) => {
   if (compact) {
     return (
       <label
-        className="bg-yellow-400 hover:bg-yellow-500 p-2 rounded-md cursor-pointer flex items-center justify-center"
+        htmlFor="fileUpload"
+        className="bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 p-2 rounded-lg cursor-pointer flex items-center justify-center shadow-lg transition-colors duration-200"
         title="Upload PDF"
       >
-        <ArrowUpTrayIcon className="w-5 h-5 text-white" />
+        <ArrowUpTrayIcon className="w-6 h-6 text-white" />
         <input
+          id="fileUpload"
           type="file"
           accept="application/pdf"
           onChange={handleChange}
@@ -41,14 +44,17 @@ const Upload = ({ onFilename, onFileSelect, compact = false }) => {
 
   return (
     <div className="flex-1">
-      <label className="block text-sm font-medium">Upload PDF</label>
+      <label className="block text-sm font-medium mb-1 text-gray-300">Upload PDF</label>
       <input
         type="file"
         accept="application/pdf"
         onChange={handleChange}
         disabled={loading}
-        className="block w-full border rounded-md p-2 text-sm"
+        className="block w-full border border-gray-700 rounded-md p-2 text-sm bg-gray-800 text-gray-200 placeholder-gray-400 focus:outline-yellow-400"
       />
+      {loading && (
+        <p className="text-xs text-yellow-400 mt-1 animate-pulse">Uploading...</p>
+      )}
     </div>
   );
 };
