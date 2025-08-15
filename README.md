@@ -36,6 +36,7 @@ helped me build the project efficently.
 ---
 
 ## 📦 Project Structure
+```
 PDF-DOST/
 │
 ├── backend/ # Flask
@@ -44,10 +45,11 @@ PDF-DOST/
 ├── README.md # You're reading it!
 ├── .gitignore
 └── ...
+```
 
 
 front-end
-
+```
 src/
 ├── components/
 │   ├── Navbar.jsx
@@ -64,9 +66,6 @@ src/
 │   ├── Heros.jsx
 ├── services/
 │   ├── api.js
-
-
-back-end
 backend/
 ├── static/
 │   └── uploads/
@@ -84,6 +83,7 @@ backend/
 ├── check_model.py
 ├── qa_engine.py
 └── requirements.txt
+```
 
 
 ## Thankyou 
