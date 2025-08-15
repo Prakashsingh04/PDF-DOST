@@ -6,7 +6,7 @@ An interactive PDF web assistant that lets you upload a PDF, ask natural-languag
 ## 🖼️ Screenshots.
 
 ### Main UI
-> ![PDF-DOST](frontend\public\pdf-dost-ss.png)  
+![PDF-DOST](frontend\public\pdf-dost-ss.png)  
 > _Modern, focused split-view with chat and interactive PDF preview_
 
 ### Structure Diagram
