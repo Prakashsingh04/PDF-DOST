@@ -35,6 +35,7 @@ An interactive PDF web assistant that lets you upload a PDF, ask natural-languag
 ---
 
 ## 📦 Project Structure
+
 ```
 frontend/
 ├── src/
