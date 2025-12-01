@@ -35,7 +35,7 @@ def extract_text_from_pdf(file_path):
     return text
 
 
-@app.route('/'):
+@app.route('/')
 def home():
     return "PDF-DOST backend is running."
 # ----------- Upload Route ------------
