@@ -1,6 +1,6 @@
  # backend/app.py
 #.\venv\Scripts\activate  always activate it 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 import pdfplumber
@@ -51,9 +51,23 @@ def upload_pdf():
     if file and file.filename.endswith('.pdf'):
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
-        return jsonify({'message': 'File uploaded successfully', 'filename': file.filename}), 200
+
+        # Prefer BACKEND_URL env, else infer from request
+        backend_url = os.environ.get("BACKEND_URL", request.host_url.rstrip("/"))
+        file_url = f"{backend_url}/uploads/{file.filename}"
+
+        return jsonify({
+            'message': 'File uploaded successfully',
+            'filename': file.filename,
+            'url': file_url
+        }), 200
 
     return jsonify({'error': 'Invalid file format (PDF only)'}), 400
+
+# ----------- Serve Uploaded Files ------------
+@app.route('/uploads/<path:filename>')
+def serve_uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # ----------- Extract & Chunk Route ------------
 @app.route('/extract', methods=['POST'])

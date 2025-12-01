@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { uploadPDF, extractChunks } from "../../services/api";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 
+// Support either VITE_API_BASE (current) or VITE_API_URL (fallback)
+const API_BASE =
+  import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL || "http://localhost:5000";
 const Upload = ({ onFilename, onFileSelect, compact = false }) => {
   const [loading, setLoading] = useState(false);
 
@@ -11,9 +14,10 @@ const Upload = ({ onFilename, onFileSelect, compact = false }) => {
 
     setLoading(true);
     try {
-      const { filename } = await uploadPDF(file);
+      const { filename, url } = await uploadPDF(file);
       onFilename(filename);
-      onFileSelect(`http://localhost:5000/static/uploads/${filename}`);
+      // Prefer URL from backend, else construct from API base
+      onFileSelect(url || `${API_BASE}/uploads/${filename}`);
       await extractChunks(filename);
     } catch (err) {
       console.error("❌ Upload failed", err);
