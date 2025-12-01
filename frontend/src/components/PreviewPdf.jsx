@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
-// Use CDN worker to avoid missing worker path in production
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+import { Document, Page } from "react-pdf";
 
 const PreviewPdf = ({ file, filename }) => {
   const [numPages, setNumPages] = useState(null);
