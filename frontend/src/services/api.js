@@ -1,7 +1,8 @@
 // src/services/api.js
 import axios from "axios";
 
-const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:5000";
+// Vite uses import.meta.env and requires VITE_ prefix for custom vars
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5137";
 
 // Upload PDF
 export const uploadPDF = async (file) => {
